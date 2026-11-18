@@ -9,7 +9,10 @@ describe('NodeSerialPort', () => {
   });
 
   it('reports the USB identifiers when provided', () => {
-    const port: NodeSerialPort = new NodeSerialPort({ path: '/dev/ttyUSB0', info: { usbVendorId: 0x10c4 } });
+    const port: NodeSerialPort = new NodeSerialPort({
+      path: '/dev/ttyUSB0',
+      info: { usbVendorId: 0x10c4 },
+    });
     expect(port.getInfo()).toEqual({ usbVendorId: 0x10c4 });
   });
 });
