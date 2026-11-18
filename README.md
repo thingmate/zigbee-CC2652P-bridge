@@ -17,4 +17,3 @@ npm install @thingmate/zigbee-CC2652P-bridge --save
 
 ## 📜 Documentation
 
-TODO
