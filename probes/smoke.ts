@@ -18,38 +18,43 @@ function formatFrame(frame: ZCLCommandFrame): string {
     .padStart(2, '0')} payload ${payload || '(empty)'} [${frame.direction}]`;
 }
 
-const port = await requestCoordinatorPort();
-const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+try {
+  const port = await requestCoordinatorPort();
+  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
 
-const state: number = await coordinator.readDeviceState();
-console.log(`device state: ${state}`);
+  const state: number = await coordinator.readDeviceState();
+  console.log(`device state: ${state}`);
 
-const config = await coordinator.config.read.call(new AbortController().signal);
-console.log(
-  `config: channel ${config.channel}  panId 0x${config.panId.toString(16).padStart(4, '0')}  extPanId 0x${config.extPanId
-    .toString(16)
-    .padStart(16, '0')}  key ${Array.from(config.key)
-    .map((byte: number): string => byte.toString(16).padStart(2, '0'))
-    .join('')}  txRadio ${config.txRadio} dBm`,
-);
+  const config = await coordinator.config.read.call(new AbortController().signal);
+  console.log(
+    `config: channel ${config.channel}  panId 0x${config.panId.toString(16).padStart(4, '0')}  extPanId 0x${config.extPanId
+      .toString(16)
+      .padStart(16, '0')}  key ${Array.from(config.key)
+      .map((byte: number): string => byte.toString(16).padStart(2, '0'))
+      .join('')}  txRadio ${config.txRadio} dBm`,
+  );
 
-console.log('opening the network for 60 seconds...');
-await coordinator.permitJoin.call(new AbortController().signal, 60);
+  console.log('opening the network for 60 seconds...');
+  await coordinator.permitJoin.call(new AbortController().signal, 60);
 
-const controller: AbortController = new AbortController();
-const resource = await coordinator.command.observe.call(controller.signal);
-resource.listen((frame): void => {
-  console.log(`frame: ${formatFrame(frame[0] as ZCLCommandFrame)}`);
-});
-console.log(
-  `observing incoming frames for ${OBSERVATION_WINDOW_MS / 1000} seconds (pair a device now if you want)...`,
-);
-await new Promise<void>((resolve: () => void): void => {
-  setTimeout(resolve, OBSERVATION_WINDOW_MS);
-});
+  const controller: AbortController = new AbortController();
+  const resource = await coordinator.command.observe.call(controller.signal);
+  resource.listen((frame): void => {
+    console.log(`frame: ${formatFrame(frame[0] as ZCLCommandFrame)}`);
+  });
+  console.log(
+    `observing incoming frames for ${OBSERVATION_WINDOW_MS / 1000} seconds (pair a device now if you want)...`,
+  );
+  await new Promise<void>((resolve: () => void): void => {
+    setTimeout(resolve, OBSERVATION_WINDOW_MS);
+  });
 
-console.log('closing the network...');
-await coordinator.permitJoin.call(new AbortController().signal, 0);
-await resource.close();
-await coordinator.close();
-console.log('smoke test done');
+  console.log('closing the network...');
+  await coordinator.permitJoin.call(new AbortController().signal, 0);
+  await resource.close();
+  await coordinator.close();
+  console.log('smoke test done');
+} catch (error: unknown) {
+  console.error(`smoke failed: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
+}

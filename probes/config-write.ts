@@ -89,38 +89,43 @@ function formatConfig(config: ZigbeeCoordinatorConfig): string {
     .join('')}  txRadio ${config.txRadio} dBm`;
 }
 
-const overrides: ConfigOverrides = parseArguments(process.argv.slice(2));
-const port = await requestCoordinatorPort();
-const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+try {
+  const overrides: ConfigOverrides = parseArguments(process.argv.slice(2));
+  const port = await requestCoordinatorPort();
+  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
 
-const current: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
-  new AbortController().signal,
-);
-console.log(`current config: ${formatConfig(current)}`);
-
-const desired: ZigbeeCoordinatorConfig = {
-  channel: overrides.channel ?? current.channel,
-  panId: overrides.panId ?? current.panId,
-  extPanId: overrides.extPanId ?? current.extPanId,
-  key: overrides.key ?? current.key,
-  txRadio: current.txRadio,
-};
-
-const destructive: boolean =
-  desired.channel !== current.channel ||
-  desired.panId !== current.panId ||
-  desired.extPanId !== current.extPanId ||
-  desired.key.some((byte: number, index: number): boolean => byte !== current.key[index]);
-if (destructive) {
-  console.log(
-    '!! DESTRUCTIVE: the network will be RE-COMMISSIONED, every paired device must be paired again !!',
+  const current: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
+    new AbortController().signal,
   );
+  console.log(`current config: ${formatConfig(current)}`);
+
+  const desired: ZigbeeCoordinatorConfig = {
+    channel: overrides.channel ?? current.channel,
+    panId: overrides.panId ?? current.panId,
+    extPanId: overrides.extPanId ?? current.extPanId,
+    key: overrides.key ?? current.key,
+    txRadio: current.txRadio,
+  };
+
+  const destructive: boolean =
+    desired.channel !== current.channel ||
+    desired.panId !== current.panId ||
+    desired.extPanId !== current.extPanId ||
+    desired.key.some((byte: number, index: number): boolean => byte !== current.key[index]);
+  if (destructive) {
+    console.log(
+      '!! DESTRUCTIVE: the network will be RE-COMMISSIONED, every paired device must be paired again !!',
+    );
+  }
+
+  await coordinator.config.write.call(new AbortController().signal, desired);
+  const applied: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
+    new AbortController().signal,
+  );
+  console.log(`applied config: ${formatConfig(applied)}`);
+
+  await coordinator.close();
+} catch (error: unknown) {
+  console.error(`config-write failed: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
 }
-
-await coordinator.config.write.call(new AbortController().signal, desired);
-const applied: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
-  new AbortController().signal,
-);
-console.log(`applied config: ${formatConfig(applied)}`);
-
-await coordinator.close();

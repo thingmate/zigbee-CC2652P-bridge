@@ -15,26 +15,31 @@ function formatFrame(frame: ZCLCommandFrame): string {
     .padStart(2, '0')} payload ${payload || '(empty)'} [${frame.direction}]`;
 }
 
-const port = await requestCoordinatorPort();
-const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+try {
+  const port = await requestCoordinatorPort();
+  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
 
-const resource = await coordinator.command.observe.call(new AbortController().signal);
-resource.listen((frame): void => {
-  console.log(`frame: ${formatFrame(frame[0] as ZCLCommandFrame)}`);
-});
-console.log('observing incoming frames - press Ctrl+C to stop');
+  const resource = await coordinator.command.observe.call(new AbortController().signal);
+  resource.listen((frame): void => {
+    console.log(`frame: ${formatFrame(frame[0] as ZCLCommandFrame)}`);
+  });
+  console.log('observing incoming frames - press Ctrl+C to stop');
 
-let closing: boolean = false;
-process.on('SIGINT', (): void => {
-  if (closing) {
-    return;
-  }
-  closing = true;
-  console.log('stopping...');
-  void resource
-    .close()
-    .then((): Promise<void> => coordinator.close())
-    .then((): void => {
-      process.exit(0);
-    });
-});
+  let closing: boolean = false;
+  process.on('SIGINT', (): void => {
+    if (closing) {
+      return;
+    }
+    closing = true;
+    console.log('stopping...');
+    void resource
+      .close()
+      .then((): Promise<void> => coordinator.close())
+      .then((): void => {
+        process.exit(0);
+      });
+  });
+} catch (error: unknown) {
+  console.error(`monitor failed: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
+}
