@@ -781,9 +781,11 @@ __metadata:
     "@thingmate/abilities": "npm:^1.0.0"
     "@thingmate/zigbee": "npm:^1.0.0"
     "@types/node": "npm:^26.6.6"
+    "@types/w3c-web-serial": "npm:^1.0.9"
     "@typescript/native": "npm:typescript@^7.0.2"
     "@vitest/coverage-istanbul": "npm:^5.1.0"
     "@xstd/async-function": "npm:^1.3.1"
+    "@xstd/listener-resource": "npm:^1.0.1"
     "@xstd/none": "npm:^1.0.0"
     "@xstd/observable-async-function": "npm:^1.0.0"
     fabrique: "npm:2.0.37"
@@ -852,6 +854,13 @@ __metadata:
   dependencies:
     undici-types: "npm:~8.9.0"
   checksum: 10c0/5cb63f644f6e85a257a9cd2403cbcbe196760e2a35fd3ec9fb8b5cff663e14cc832b198cc17b53f870a2e30900ed45a1fb3f53e6589aba26b8e8c484aa672053
+  languageName: node
+  linkType: hard
+
+"@types/w3c-web-serial@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "@types/w3c-web-serial@npm:1.0.9"
+  checksum: 10c0/ef96b42f9ffb539865cb8872bfbfb15929266c4698db0df91e63c742a15965c399d6e02f2409f9ea3be699f65eab39e70bfa5990e46dd9cca14a7f6896ee060e
   languageName: node
   linkType: hard
 

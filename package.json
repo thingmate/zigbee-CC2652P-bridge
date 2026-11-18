@@ -2,8 +2,21 @@
   "name": "@thingmate/zigbee-CC2652P-bridge",
   "version": "0.0.1",
   "type": "module",
-  "description": "TODO",
-  "keywords": [],
+  "description": "Drive a Zigbee coordinator from a CC2652P Z-Stack ZNP coordinator over the Web Serial API",
+  "keywords": [
+    "zigbee",
+    "cc2652p",
+    "zbdongle-p",
+    "znp",
+    "web-serial",
+    "zcl",
+    "coordinator",
+    "bridge",
+    "iot",
+    "smart-home",
+    "home-automation",
+    "typescript"
+  ],
   "author": "Valentin Richard",
   "license": "MIT",
   "repository": {
@@ -33,6 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/w3c-web-serial": "^1.0.9",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/coverage-istanbul": "^5.1.0",
     "fabrique": "2.0.37",
@@ -51,6 +65,7 @@
     "@thingmate/abilities": "^1.0.0",
     "@thingmate/zigbee": "^1.0.0",
     "@xstd/async-function": "^1.3.1",
+    "@xstd/listener-resource": "^1.0.1",
     "@xstd/none": "^1.0.0",
     "@xstd/observable-async-function": "^1.0.0",
     "serialport": "^13.0.0"
