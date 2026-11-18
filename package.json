@@ -46,5 +46,13 @@
   "fabrique": {
     "version": "2.0.37",
     "type": "lib"
+  },
+  "dependencies": {
+    "@thingmate/abilities": "^1.0.0",
+    "@thingmate/zigbee": "^1.0.0",
+    "@xstd/async-function": "^1.3.1",
+    "@xstd/none": "^1.0.0",
+    "@xstd/observable-async-function": "^1.0.0",
+    "serialport": "^13.0.0"
   }
 }
