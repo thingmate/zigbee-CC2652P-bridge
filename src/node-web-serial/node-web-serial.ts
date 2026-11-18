@@ -34,6 +34,11 @@ export class NodeSerialPort implements SerialPortLike {
     this.#info = info ?? {};
   }
 
+  /** The operating system path of the port (e.g. `/dev/ttyUSB0` or `COM3`). */
+  get path(): string {
+    return this.#path;
+  }
+
   async open(options: SerialPortLikeOptions): Promise<void> {
     if (this.#port !== undefined) {
       throw new Error('port is already open');
