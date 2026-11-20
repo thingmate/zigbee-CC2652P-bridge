@@ -59,18 +59,18 @@ describe('ZnpDevice', () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
-    expect(await device.readConfig()).toEqual({ ...NETWORK, txRadio: 5 });
+    expect(await device.readNetworkState()).toEqual({ ...NETWORK, txRadio: 5 });
   });
 
   it('stores a configuration written before the first start', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     const device: ZnpDevice = new ZnpDevice(mock.port);
-    await device.writeConfig({
+    await device.setTxRadio(3);
+    await device.ensureNetworkOptions({
       channel: 25,
       panId: 0x4321,
       extPanId: 0x01n,
       key: new Uint8Array(16),
-      txRadio: 3,
     });
     expect(mock.port.written.length).toBe(0);
     // The configuration is applied on the first start.
@@ -86,7 +86,8 @@ describe('ZnpDevice', () => {
     const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     const before: number = mock.port.written.length;
-    await device.writeConfig({ ...NETWORK, txRadio: 3 });
+    await device.setTxRadio(3);
+    await device.ensureNetworkOptions(NETWORK);
     const written: readonly Uint8Array[] = mock.port.written.slice(before);
     // The configuration was read (2 requests) and a single stack tuning
     // request was written: no commissioning exchange happened.
@@ -103,16 +104,16 @@ describe('ZnpDevice', () => {
     const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     const configurations: unknown[] = [];
-    device.onConfig((config): void => {
+    device.onNetworkState((config): void => {
       configurations.push(config);
     });
     const before: number = mock.port.written.length;
-    await device.writeConfig({
+    await device.setTxRadio(7);
+    await device.ensureNetworkOptions({
       channel: 20,
       panId: 0x5678,
       extPanId: 0xaabbccddn,
       key: new Uint8Array(16),
-      txRadio: 7,
     });
     expect(mock.port.written.length).toBeGreaterThan(before);
     expect(mock.getNvItem(ZNP_NV_ITEM_ID.PANID)).toEqual(Uint8Array.from([0x78, 0x56]));
@@ -123,7 +124,7 @@ describe('ZnpDevice', () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     const device: ZnpDevice = new ZnpDevice(mock.port);
     const configurations: unknown[] = [];
-    device.onConfig((config): void => {
+    device.onNetworkState((config): void => {
       configurations.push(config);
     });
     await device.ensureStarted();

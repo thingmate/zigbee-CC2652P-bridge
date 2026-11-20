@@ -1,5 +1,4 @@
 import type { SerialPort } from '@thingmate/node-web-serial';
-import type { ZigbeeCoordinatorConfig } from '@thingmate/zigbee';
 import { ZnpConnection } from '../connection/znp-connection.ts';
 import { ZnpSubsystem, type ZnpFrame } from '../frame/znp-frame.ts';
 import {
@@ -11,6 +10,7 @@ import {
   ZDO_DEVICE_STATE,
   ZNP_NV_ITEM_ID,
   type ZnpNetworkOptions,
+  type ZnpNetworkState,
 } from '../network/znp-network.ts';
 import { ZnpNvMemory } from '../nv/znp-nv.ts';
 
@@ -28,11 +28,10 @@ const DEFAULT_TX_RADIO = 5 as const;
 export class ZnpDevice {
   readonly #port: SerialPort;
   readonly #frameListeners: ((frame: ZnpFrame) => void)[] = [];
-  readonly #configListeners: ((config: ZigbeeCoordinatorConfig) => void)[] = [];
+  readonly #networkStateListeners: ((state: ZnpNetworkState) => void)[] = [];
   #connection: ZnpConnection | undefined;
   #nv: ZnpNvMemory | undefined;
   #startedPromise: Promise<void> | undefined;
-  #sequence: number = 0;
   #transId: number = 0;
   #txRadio: number = DEFAULT_TX_RADIO;
   #pendingNetworkOptions: ZnpNetworkOptions | undefined;
@@ -104,68 +103,58 @@ export class ZnpDevice {
   }
 
   /**
-   * Registers a listener receiving the coordinator's network configuration on
-   * every update (after a startup or a re-commissioning).
+   * Registers a listener receiving the coordinator's network state on every
+   * update (after a startup or a re-commissioning).
    * @param listener - The listener to register; it must not throw.
    * @returns An unsubscription function.
    */
-  onConfig(listener: (config: ZigbeeCoordinatorConfig) => void): () => void {
-    this.#configListeners.push(listener);
+  onNetworkState(listener: (state: ZnpNetworkState) => void): () => void {
+    this.#networkStateListeners.push(listener);
     return (): void => {
-      const index: number = this.#configListeners.indexOf(listener);
+      const index: number = this.#networkStateListeners.indexOf(listener);
       if (index !== -1) {
-        this.#configListeners.splice(index, 1);
+        this.#networkStateListeners.splice(index, 1);
       }
     };
   }
 
   /**
-   * Reads the coordinator's current network configuration.
-   * @returns The configuration reported by the coordinator.
+   * Reads the coordinator's current network state.
+   * @returns The state reported by the coordinator.
    */
-  async readConfig(): Promise<ZigbeeCoordinatorConfig> {
+  async readNetworkState(): Promise<ZnpNetworkState> {
     await this.ensureStarted();
-    return this.#readConfig(this.#connection!);
+    return this.#readNetworkState(this.#connection!);
   }
 
   /**
-   * Applies a network configuration:
-   * - the radio transmission power is set immediately,
-   * - the network parameters are written to non-volatile memory: when the
-   *   coordinator is running a network, the network is re-commissioned with
-   *   the new parameters (every paired device must be paired again),
+   * Ensures the coordinator runs the provided network parameters:
    * - when the connection was never opened, the parameters are stored for the
-   *   first startup.
-   * @param config - The configuration to apply.
+   *   first startup,
+   * - when the coordinator is running a network with different parameters, it
+   *   is re-commissioned with the new ones (every paired device must be paired
+   *   again),
+   * - nothing happens when the parameters already match.
+   * @param options - The network parameters to apply.
    */
-  async writeConfig(config: ZigbeeCoordinatorConfig): Promise<void> {
+  async ensureNetworkOptions(options: ZnpNetworkOptions): Promise<void> {
     if (this.#connection === undefined) {
-      // The connection was never opened: the configuration is stored for the
+      // The connection was never opened: the parameters are stored for the
       // first startup.
-      this.#txRadio = config.txRadio;
-      this.#txRadioPending = true;
-      this.#pendingNetworkOptions = toNetworkOptions(config);
+      this.#pendingNetworkOptions = options;
       return;
     }
-    const current: ZigbeeCoordinatorConfig = await this.#readConfig(this.#connection!);
-    await this.#setTxRadio(config.txRadio);
+    const current: ZnpNetworkState = await this.#readNetworkState(this.#connection!);
     if (
-      current.channel === config.channel &&
-      current.panId === config.panId &&
-      current.extPanId === config.extPanId &&
-      equalBytes(current.key, config.key)
+      current.channel === options.channel &&
+      current.panId === options.panId &&
+      current.extPanId === options.extPanId &&
+      equalBytes(current.key, options.key)
     ) {
       return;
     }
-    await commissionZnpNetwork(this.#connection!, toNetworkOptions(config));
-    await this.#emitCurrentConfig();
-  }
-
-  /** Returns the next ZCL transaction sequence number (0..255). */
-  nextSequence(): number {
-    const sequence: number = this.#sequence;
-    this.#sequence = (this.#sequence + 1) & 0xff;
-    return sequence;
+    await commissionZnpNetwork(this.#connection!, options);
+    await this.#emitCurrentNetworkState();
   }
 
   /** Returns the next AF data request transaction identifier (0..255). */
@@ -233,9 +222,9 @@ export class ZnpDevice {
     );
     if (this.#txRadioPending) {
       this.#txRadioPending = false;
-      await this.#setTxRadio(this.#txRadio);
+      await this.setTxRadio(this.#txRadio);
     }
-    await this.#emitCurrentConfig();
+    await this.#emitCurrentNetworkState();
   }
 
   /**
@@ -259,8 +248,13 @@ export class ZnpDevice {
     await connection.request(ZnpSubsystem.SYS, 0x01, new Uint8Array(0), { timeout: 1000 });
   }
 
-  /** Sets the radio transmission power through the stack tuning command. */
-  async #setTxRadio(txRadio: number): Promise<void> {
+  /**
+   * Sets the radio transmission power through the stack tuning command. When
+   * the connection was never opened, the power is stored for the first
+   * startup.
+   * @param txRadio - The transmission power, in dBm.
+   */
+  async setTxRadio(txRadio: number): Promise<void> {
     this.#txRadio = txRadio;
     const connection: ZnpConnection | undefined = this.#connection;
     if (connection === undefined) {
@@ -272,19 +266,19 @@ export class ZnpDevice {
     this.#txRadioPending = false;
   }
 
-  async #emitCurrentConfig(): Promise<void> {
-    const config: ZigbeeCoordinatorConfig = await this.#readConfig(this.#connection!);
-    for (const listener of [...this.#configListeners]) {
-      listener(config);
+  async #emitCurrentNetworkState(): Promise<void> {
+    const state: ZnpNetworkState = await this.#readNetworkState(this.#connection!);
+    for (const listener of [...this.#networkStateListeners]) {
+      listener(state);
     }
   }
 
   /**
-   * Reads the configuration directly from an open connection, without going
+   * Reads the network state directly from an open connection, without going
    * through {@link request}: it is also used during the startup itself, where
    * awaiting {@link ensureStarted} would deadlock.
    */
-  async #readConfig(connection: ZnpConnection): Promise<ZigbeeCoordinatorConfig> {
+  async #readNetworkState(connection: ZnpConnection): Promise<ZnpNetworkState> {
     const extNwkInfo: ZnpFrame = await connection.request(ZnpSubsystem.ZDO, 0x50);
     // [shortAddr(2), devState(1), panId(2), parentAddr(2), extPanId(8), parentExtAddr(8), channel(1)]
     const panId: number =
@@ -296,18 +290,6 @@ export class ZnpDevice {
     const key: Uint8Array = getNvInfo.payload.subarray(16, 32);
     return { channel, panId, extPanId, key: Uint8Array.from(key), txRadio: this.#txRadio };
   }
-}
-
-/**
- * Converts a coordinator configuration into commissioning network options.
- */
-function toNetworkOptions(config: ZigbeeCoordinatorConfig): ZnpNetworkOptions {
-  return {
-    channel: config.channel,
-    panId: config.panId,
-    extPanId: config.extPanId,
-    key: config.key,
-  };
 }
 
 /**

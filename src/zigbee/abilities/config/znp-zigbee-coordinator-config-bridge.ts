@@ -6,8 +6,8 @@ import { observableFromListenerSource } from '../../observable-from-listener-sou
 
 /**
  * Property abilities over the network configuration of a Z-Stack ZNP
- * coordinator, bridged to the ZNP connection:
- * - `read` reads the configuration directly from the coordinator,
+ * coordinator, bridged to the ZNP device:
+ * - `read` reads the network state reported by the coordinator,
  * - `write` applies the configuration: the radio transmission power is set
  *   immediately, and the network parameters re-commission the network when
  *   they differ from the current network,
@@ -27,19 +27,25 @@ export class ZnpZigbeeCoordinatorConfigBridge
       read: new AsyncFunction<[], ZigbeeCoordinatorConfig>(
         async (_signal: AbortSignal): Promise<ZigbeeCoordinatorConfig> => {
           await device.ensureStarted();
-          return device.readConfig();
+          return device.readNetworkState();
         },
       ),
       write: new AsyncFunction<[ZigbeeCoordinatorConfig], void>(
         async (_signal: AbortSignal, config: ZigbeeCoordinatorConfig): Promise<void> => {
-          await device.writeConfig(config);
+          await device.setTxRadio(config.txRadio);
+          await device.ensureNetworkOptions({
+            channel: config.channel,
+            panId: config.panId,
+            extPanId: config.extPanId,
+            key: config.key,
+          });
         },
       ),
       observe: observableFromListenerSource<ZigbeeCoordinatorConfig>(
         async (): Promise<(emit: (config: ZigbeeCoordinatorConfig) => void) => () => void> => {
           await device.ensureStarted();
           return (emit: (config: ZigbeeCoordinatorConfig) => void): (() => void) => {
-            return device.onConfig(emit);
+            return device.onNetworkState(emit);
           };
         },
       ),

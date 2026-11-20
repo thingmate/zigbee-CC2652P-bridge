@@ -22,6 +22,8 @@ const DATA_REQUEST_RADIUS = 30 as const;
 export class ZnpZigbeeCommandFrameBridge extends CommandAbilities<
   readonly [command: ZCLCommandFrame]
 > {
+  #sequence: number = 0;
+
   /**
    * Creates command abilities bridged to the provided ZNP device.
    * @param device - The ZNP device connection.
@@ -31,7 +33,7 @@ export class ZnpZigbeeCommandFrameBridge extends CommandAbilities<
       send: new AsyncFunction<readonly [ZCLCommandFrame], void>(
         async (_signal: AbortSignal, command: ZCLCommandFrame): Promise<void> => {
           await device.ensureStarted();
-          const encoded: Uint8Array = encodeZclCommandFrame(command, device.nextSequence());
+          const encoded: Uint8Array = encodeZclCommandFrame(command, this.#nextSequence());
           const transId: number = device.nextTransId();
           // The data confirmation waiter is registered first: the
           // confirmation may arrive in the same read batch as the data
@@ -137,5 +139,12 @@ export class ZnpZigbeeCommandFrameBridge extends CommandAbilities<
         },
       ),
     });
+  }
+
+  /** Returns the next ZCL transaction sequence number (0..255). */
+  #nextSequence(): number {
+    const sequence: number = this.#sequence;
+    this.#sequence = (this.#sequence + 1) & 0xff;
+    return sequence;
   }
 }

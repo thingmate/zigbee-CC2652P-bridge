@@ -17,6 +17,23 @@ export interface ZnpNetworkOptions {
 }
 
 /**
+ * The network parameters currently in effect on a Z-Stack ZNP coordinator,
+ * as reported by the coordinator itself.
+ */
+export interface ZnpNetworkState {
+  /** IEEE 802.15.4 channel (11..26). */
+  readonly channel: number;
+  /** 16-bit PAN identifier. */
+  readonly panId: number;
+  /** 64-bit extended PAN identifier. */
+  readonly extPanId: bigint;
+  /** 128-bit network key. */
+  readonly key: Uint8Array;
+  /** Radio transmission power, in dBm. */
+  readonly txRadio: number;
+}
+
+/**
  * Z-Stack non-volatile item identifiers used for commissioning, from the
  * Z-Stack ZNP interface specification.
  */
