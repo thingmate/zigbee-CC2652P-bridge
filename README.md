@@ -37,7 +37,7 @@ The first ability call opens the port (115200 bauds), skips a possible serial bo
 
 ```ts
 import { NodeSerial } from '@thingmate/node-web-serial';
-import { ZnpZigbeeCoordinator } from '@thingmate/znp-zigbee-bridge/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '@thingmate/znp-zigbee-bridge/src/zigbee/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 
 // select the coordinator's serial port (USB filters, as in a browser)
 const serial: NodeSerial = new NodeSerial();
