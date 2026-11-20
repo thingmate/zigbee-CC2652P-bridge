@@ -774,11 +774,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@thingmate/node-web-serial@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@thingmate/node-web-serial@npm:1.0.0"
+  dependencies:
+    serialport: "npm:^13.0.0"
+  checksum: 10c0/f24ca29e9a9a7bf275652a00cf60b4651fab4987d4f8e2f160935d5abad48a1e897c3dffa228892b64883d753c37aa9cd871a4363b0f4f158728dfc1a4274e17
+  languageName: node
+  linkType: hard
+
 "@thingmate/zigbee-CC2652P-bridge@workspace:.":
   version: 0.0.0-use.local
   resolution: "@thingmate/zigbee-CC2652P-bridge@workspace:."
   dependencies:
     "@thingmate/abilities": "npm:^1.0.0"
+    "@thingmate/node-web-serial": "npm:^1.0.0"
     "@thingmate/zigbee": "npm:^1.0.0"
     "@types/node": "npm:^26.6.6"
     "@types/w3c-web-serial": "npm:^1.0.9"
@@ -791,7 +801,6 @@ __metadata:
     fabrique: "npm:2.0.37"
     prettier: "npm:^3.10.1"
     prettier-plugin-organize-imports: "npm:^4.3.0"
-    serialport: "npm:^13.0.0"
     typescript: "npm:typescript@~6.0.3"
     vite: "npm:^8.3.8"
     vitest: "npm:^5.1.0"

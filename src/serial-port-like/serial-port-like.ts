@@ -3,8 +3,8 @@
  * (https://wicg.github.io/serial/) used by this library.
  *
  * The real browser `SerialPort` structurally satisfies this interface. Node.js
- * users get an equivalent implementation through the `node-web-serial` module,
- * and tests inject mocks.
+ * users get an equivalent implementation through the `@thingmate/node-web-serial`
+ * package, and tests inject mocks.
  */
 export interface SerialPortLike {
   /**
@@ -71,15 +71,13 @@ export interface SerialPortLikeSignals {
 
 /**
  * Modem control signals state of a {@link SerialPortLike}, mirroring the Web
- * Serial API `SerialSignalsState` (returned by `getSignals`).
+ * Serial API `SerialInputSignals` (returned by `getSignals`).
  */
 export interface SerialPortLikeSignalsState {
   readonly clearToSend: boolean;
   readonly dataCarrierDetect: boolean;
-  readonly dataTerminalReady: boolean;
   readonly dataSetReady: boolean;
   readonly ringIndicator: boolean;
-  readonly requestToSend: boolean;
 }
 
 /**

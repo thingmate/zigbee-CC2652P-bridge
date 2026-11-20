@@ -1,4 +1,4 @@
-import { NodeSerial } from '../src/node-web-serial/node-web-serial.ts';
+import { NodeSerial } from '@thingmate/node-web-serial';
 
 const serial: NodeSerial = new NodeSerial();
 const ports: Awaited<ReturnType<typeof serial.getPorts>> = await serial.getPorts();

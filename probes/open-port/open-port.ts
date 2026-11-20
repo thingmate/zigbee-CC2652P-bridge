@@ -1,4 +1,4 @@
-import { NodeSerial, NodeSerialPort } from '../../src/node-web-serial/node-web-serial.ts';
+import { NodeSerial, NodeSerialPort } from '@thingmate/node-web-serial';
 
 /** USB vendor identifier of the Silicon Labs CP2102N bridge of the ZBDongle-P. */
 const SILICON_LABS_VENDOR_ID = 0x10c4 as const;
@@ -10,7 +10,9 @@ const SILICON_LABS_VENDOR_ID = 0x10c4 as const;
  */
 export async function requestCoordinatorPort(): Promise<NodeSerialPort> {
   const serial: NodeSerial = new NodeSerial();
-  const port: NodeSerialPort = await serial.requestPort({ usbVendorId: SILICON_LABS_VENDOR_ID });
+  const port: NodeSerialPort = await serial.requestPort({
+    filters: [{ usbVendorId: SILICON_LABS_VENDOR_ID }],
+  });
   const info: { usbVendorId?: number | undefined; usbProductId?: number | undefined } =
     port.getInfo();
   const vendorId: string = info.usbVendorId?.toString(16).padStart(4, '0') ?? '----';

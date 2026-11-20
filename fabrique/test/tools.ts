@@ -65,10 +65,8 @@ export class MockSerialPort implements SerialPortLike {
   #signals: SerialPortLikeSignalsState = {
     clearToSend: false,
     dataCarrierDetect: false,
-    dataTerminalReady: false,
     dataSetReady: false,
     ringIndicator: false,
-    requestToSend: false,
   };
 
   /** Bytes written by the host since the port was opened. */
@@ -119,14 +117,11 @@ export class MockSerialPort implements SerialPortLike {
     this.#readableController?.enqueue(bytes);
   }
 
-  async setSignals(signals?: SerialPortLikeSignals): Promise<void> {
-    if (signals?.dataTerminalReady !== undefined) {
-      this.#signals = { ...this.#signals, dataTerminalReady: signals.dataTerminalReady };
-    }
-    if (signals?.requestToSend !== undefined) {
-      this.#signals = { ...this.#signals, requestToSend: signals.requestToSend };
-    }
-  }
+  /**
+   * Accepts signal changes and ignores them: the Web Serial API `getSignals`
+   * reports input signals only, which the mock keeps fixed.
+   */
+  async setSignals(_signals?: SerialPortLikeSignals): Promise<void> {}
 
   async getSignals(): Promise<SerialPortLikeSignalsState> {
     return this.#signals;
