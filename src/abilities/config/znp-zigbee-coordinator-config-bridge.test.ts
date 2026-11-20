@@ -1,19 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
-import { Cc2652pZigbeeCoordinatorConfigBridge } from './cc2652p-zigbee-coordinator-config-bridge.ts';
+import { ZnpZigbeeCoordinatorConfigBridge } from './znp-zigbee-coordinator-config-bridge.ts';
 
-describe('Cc2652pZigbeeCoordinatorConfigBridge', () => {
+describe('ZnpZigbeeCoordinatorConfigBridge', () => {
   it('reads the configuration reported by the coordinator', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const abilities: Cc2652pZigbeeCoordinatorConfigBridge =
-      new Cc2652pZigbeeCoordinatorConfigBridge(
-        // The bridge only needs the device's abilities; a real device is
-        // constructed with the mock's port.
-        new (await import('../../cc2652p-znp-device/cc2652p-znp-device.ts')).Cc2652pZnpDevice(
-          mock.port,
-        ),
-      );
+    const abilities: ZnpZigbeeCoordinatorConfigBridge = new ZnpZigbeeCoordinatorConfigBridge(
+      // The bridge only needs the device's abilities; a real device is
+      // constructed with the mock's port.
+      new (await import('../../znp-device/znp-device.ts')).ZnpDevice(mock.port),
+    );
     const config: Awaited<ReturnType<typeof abilities.read.call>> = await abilities.read.call(
       new AbortController().signal,
     );
@@ -31,9 +28,10 @@ describe('Cc2652pZigbeeCoordinatorConfigBridge', () => {
 
   it('emits the configuration through the observation', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const { Cc2652pZnpDevice } = await import('../../cc2652p-znp-device/cc2652p-znp-device.ts');
-    const abilities: Cc2652pZigbeeCoordinatorConfigBridge =
-      new Cc2652pZigbeeCoordinatorConfigBridge(new Cc2652pZnpDevice(mock.port));
+    const { ZnpDevice } = await import('../../znp-device/znp-device.ts');
+    const abilities: ZnpZigbeeCoordinatorConfigBridge = new ZnpZigbeeCoordinatorConfigBridge(
+      new ZnpDevice(mock.port),
+    );
     const controller: AbortController = new AbortController();
     const resource: Awaited<ReturnType<typeof abilities.observe.call>> =
       await abilities.observe.call(controller.signal);

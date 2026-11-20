@@ -1,5 +1,5 @@
 import type { ZigbeeCoordinatorConfig } from '@thingmate/zigbee';
-import { Cc2652pZigbeeCoordinator } from '../src/cc2652p-zigbee-coordinator/cc2652p-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '../src/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 import { requestCoordinatorPort } from './open-port/open-port.ts';
 
 /** Mutable accumulator of the provided configuration overrides. */
@@ -92,7 +92,7 @@ function formatConfig(config: ZigbeeCoordinatorConfig): string {
 try {
   const overrides: ConfigOverrides = parseArguments(process.argv.slice(2));
   const port = await requestCoordinatorPort();
-  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
 
   const current: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
     new AbortController().signal,

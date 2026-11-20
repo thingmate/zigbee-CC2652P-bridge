@@ -3,9 +3,9 @@ import { ZnpFrameType, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
 import { ZnpNvMemory } from '../znp-nv/znp-nv.ts';
 
 /**
- * Network options used to commission a CC2652P coordinator.
+ * Network options used to commission a Z-Stack ZNP coordinator.
  */
-export interface Cc2652pNetworkOptions {
+export interface ZnpNetworkOptions {
   /** IEEE 802.15.4 channel (11..26). */
   readonly channel: number;
   /** 16-bit PAN identifier. */
@@ -88,7 +88,7 @@ export async function resetZnpCoordinator(connection: ZnpConnection): Promise<vo
  */
 export async function commissionZnpNetwork(
   connection: ZnpConnection,
-  options: Cc2652pNetworkOptions,
+  options: ZnpNetworkOptions,
 ): Promise<void> {
   const nv: ZnpNvMemory = new ZnpNvMemory(connection);
 

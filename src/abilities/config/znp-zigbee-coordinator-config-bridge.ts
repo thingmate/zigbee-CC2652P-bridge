@@ -1,11 +1,11 @@
 import { PropertyAbilities } from '@thingmate/abilities';
 import type { ZigbeeCoordinatorConfig, ZigbeeCoordinatorConfigAbilities } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
-import type { Cc2652pZnpDevice } from '../../cc2652p-znp-device/cc2652p-znp-device.ts';
 import { observableFromListenerSource } from '../../observable-from-listener-source/observable-from-listener-source.ts';
+import type { ZnpDevice } from '../../znp-device/znp-device.ts';
 
 /**
- * Property abilities over the network configuration of a CC2652P ZNP
+ * Property abilities over the network configuration of a Z-Stack ZNP
  * coordinator, bridged to the ZNP connection:
  * - `read` reads the configuration directly from the coordinator,
  * - `write` applies the configuration: the radio transmission power is set
@@ -14,7 +14,7 @@ import { observableFromListenerSource } from '../../observable-from-listener-sou
  * - `observe` emits the configuration after every startup or
  *   re-commissioning.
  */
-export class Cc2652pZigbeeCoordinatorConfigBridge
+export class ZnpZigbeeCoordinatorConfigBridge
   extends PropertyAbilities<ZigbeeCoordinatorConfig>
   implements ZigbeeCoordinatorConfigAbilities
 {
@@ -22,7 +22,7 @@ export class Cc2652pZigbeeCoordinatorConfigBridge
    * Creates config property abilities bridged to the provided ZNP device.
    * @param device - The ZNP device connection.
    */
-  constructor(device: Cc2652pZnpDevice) {
+  constructor(device: ZnpDevice) {
     super({
       read: new AsyncFunction<[], ZigbeeCoordinatorConfig>(
         async (_signal: AbortSignal): Promise<ZigbeeCoordinatorConfig> => {

@@ -1,32 +1,32 @@
 import { CommandAbilities } from '@thingmate/abilities';
 import type { ZCLCommandFrame } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
-import { bigintToLittleEndian, uintToLittleEndian } from '../../cc2652p-network/cc2652p-network.ts';
-import type { Cc2652pZnpDevice } from '../../cc2652p-znp-device/cc2652p-znp-device.ts';
 import { decodeZclCommandFrame } from '../../decode-zcl-command-frame/decode-zcl-command-frame.ts';
 import { encodeZclCommandFrame } from '../../encode-zcl-command-frame/encode-zcl-command-frame.ts';
 import { observableFromListenerSource } from '../../observable-from-listener-source/observable-from-listener-source.ts';
+import type { ZnpDevice } from '../../znp-device/znp-device.ts';
 import { type ZnpFrame, ZnpFrameType, ZnpSubsystem } from '../../znp-frame/znp-frame.ts';
+import { bigintToLittleEndian, uintToLittleEndian } from '../../znp-network/znp-network.ts';
 
 /** Default AF data request radius (hops). */
 const DATA_REQUEST_RADIUS = 30 as const;
 
 /**
- * Command abilities of a CC2652P ZNP coordinator, bridging
+ * Command abilities of a Z-Stack ZNP coordinator, bridging
  * {@link ZCLCommandFrame}s to the ZNP connection:
  * - `send` encodes the frame and sends it through an AF data request,
  *   waiting for the AF data confirmation,
  * - `observe` emits the ZCL frames received by the coordinator, extracted
  *   from AF incoming message indications.
  */
-export class Cc2652pZigbeeCommandFrameBridge extends CommandAbilities<
+export class ZnpZigbeeCommandFrameBridge extends CommandAbilities<
   readonly [command: ZCLCommandFrame]
 > {
   /**
    * Creates command abilities bridged to the provided ZNP device.
    * @param device - The ZNP device connection.
    */
-  constructor(device: Cc2652pZnpDevice) {
+  constructor(device: ZnpDevice) {
     super({
       send: new AsyncFunction<readonly [ZCLCommandFrame], void>(
         async (_signal: AbortSignal, command: ZCLCommandFrame): Promise<void> => {

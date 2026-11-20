@@ -1,25 +1,25 @@
-[![npm (scoped)](https://img.shields.io/npm/v/@thingmate/zigbee-CC2652P-bridge.svg)](https://www.npmjs.com/package/@thingmate/zigbee-CC2652P-bridge)
-![npm](https://img.shields.io/npm/dm/@thingmate/zigbee-CC2652P-bridge.svg)
-![NPM](https://img.shields.io/npm/l/@thingmate/zigbee-CC2652P-bridge.svg)
-![npm type definitions](https://img.shields.io/npm/types/@thingmate/zigbee-CC2652P-bridge.svg)
+[![npm (scoped)](https://img.shields.io/npm/v/@thingmate/znp-zigbee-bridge.svg)](https://www.npmjs.com/package/@thingmate/znp-zigbee-bridge)
+![npm](https://img.shields.io/npm/dm/@thingmate/znp-zigbee-bridge.svg)
+![NPM](https://img.shields.io/npm/l/@thingmate/znp-zigbee-bridge.svg)
+![npm type definitions](https://img.shields.io/npm/types/@thingmate/znp-zigbee-bridge.svg)
 
-## @thingmate/zigbee-CC2652P-bridge
+## @thingmate/znp-zigbee-bridge
 
-Drive a [Zigbee coordinator](https://www.npmjs.com/package/@thingmate/zigbee) from a CC2652P Z-Stack ZNP coordinator (SONOFF ZBDongle-P among others) over a [Web Serial API](https://wicg.github.io/serial/) port.
+Drive a [Zigbee coordinator](https://www.npmjs.com/package/@thingmate/zigbee) from a Z-Stack 3.x ZNP coordinator (SONOFF ZBDongle-P, CC1352P, CC2531 among others) over a [Web Serial API](https://wicg.github.io/serial/) port.
 
 ## 📦 Installation
 
 ```shell
-yarn add @thingmate/zigbee-CC2652P-bridge
+yarn add @thingmate/znp-zigbee-bridge
 # or
-npm install @thingmate/zigbee-CC2652P-bridge --save
+npm install @thingmate/znp-zigbee-bridge --save
 ```
 
 ## 📜 Documentation
 
 See also [`probes/README.md`](./probes/README.md): runnable hardware probes exercising the public API against a real dongle.
 
-This library bridges a `ZigbeeCoordinator` to a CC2652P coordinator speaking the Z-Stack ZNP (Monitor-and-Test) protocol over a serial port. The port is provided as a Web Serial API `SerialPort`: any spec-faithful port works, so the same code runs in a browser (port from `navigator.serial`), in Node.js (through the `NodeSerial` hub of [`@thingmate/node-web-serial`](https://www.npmjs.com/package/@thingmate/node-web-serial)), or in tests (any mock).
+This library bridges a `ZigbeeCoordinator` to a Z-Stack ZNP coordinator speaking the ZNP (Monitor-and-Test) protocol over a serial port. The port is provided as a Web Serial API `SerialPort`: any spec-faithful port works, so the same code runs in a browser (port from `navigator.serial`), in Node.js (through the `NodeSerial` hub of [`@thingmate/node-web-serial`](https://www.npmjs.com/package/@thingmate/node-web-serial)), or in tests (any mock).
 
 Each coordinator ability is mapped to ZNP commands:
 
@@ -37,14 +37,14 @@ The first ability call opens the port (115200 bauds), skips a possible serial bo
 
 ```ts
 import { NodeSerial } from '@thingmate/node-web-serial';
-import { Cc2652pZigbeeCoordinator } from '@thingmate/zigbee-CC2652P-bridge/cc2652p-zigbee-coordinator/cc2652p-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '@thingmate/znp-zigbee-bridge/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 
 // select the coordinator's serial port (USB filters, as in a browser)
 const serial: NodeSerial = new NodeSerial();
 const port = await serial.requestPort({ filters: [{ usbVendorId: 0x10c4 }] }); // Silicon Labs CP2102N
 
 // the standard ZigbeeCoordinator abilities, backed by the dongle
-const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
 
 // read the current network configuration
 const config = await coordinator.config.read.call(new AbortController().signal);

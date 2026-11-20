@@ -11,7 +11,7 @@ import {
   resumeZnpNetwork,
   uintToLittleEndian,
   ZNP_NV_ITEM_ID,
-} from './cc2652p-network.ts';
+} from './znp-network.ts';
 
 const options = {
   channel: 15,

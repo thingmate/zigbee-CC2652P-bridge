@@ -1,8 +1,8 @@
 # Hardware probes
 
-Runnable scripts exercising the library's public API against a real CC2652P
+Runnable scripts exercising the library's public API against a real Z-Stack ZNP
 dongle (SONOFF ZBDongle-P among others). Every probe goes through
-`Cc2652pZigbeeCoordinator` — plus `NodeSerial` to select the port — never
+`ZnpZigbeeCoordinator` — plus `NodeSerial` to select the port — never
 through the internal layers: they double as usage examples of the library.
 
 ## Prerequisites

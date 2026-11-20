@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
-import { Cc2652pZnpDevice } from '../../cc2652p-znp-device/cc2652p-znp-device.ts';
+import { ZnpDevice } from '../../znp-device/znp-device.ts';
 import { ZnpSubsystem } from '../../znp-frame/znp-frame.ts';
-import { Cc2652pZigbeeCommandFrameBridge } from './cc2652p-zigbee-command-frame-bridge.ts';
+import { ZnpZigbeeCommandFrameBridge } from './znp-zigbee-command-frame-bridge.ts';
 
-describe('Cc2652pZigbeeCommandFrameBridge', () => {
+describe('ZnpZigbeeCommandFrameBridge', () => {
   it('sends a ZCL command frame through an AF data request', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
-    const abilities: Cc2652pZigbeeCommandFrameBridge = new Cc2652pZigbeeCommandFrameBridge(device);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
+    const abilities: ZnpZigbeeCommandFrameBridge = new ZnpZigbeeCommandFrameBridge(device);
     // The AF data confirmation is pushed when the data request is seen.
     mock.port.written.length = 0;
     await device.ensureStarted();
@@ -50,8 +50,8 @@ describe('Cc2652pZigbeeCommandFrameBridge', () => {
 
   it('observes ZCL command frames received by the coordinator', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
-    const abilities: Cc2652pZigbeeCommandFrameBridge = new Cc2652pZigbeeCommandFrameBridge(device);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
+    const abilities: ZnpZigbeeCommandFrameBridge = new ZnpZigbeeCommandFrameBridge(device);
     const controller: AbortController = new AbortController();
     const resource: Awaited<ReturnType<typeof abilities.observe.call>> =
       await abilities.observe.call(controller.signal);

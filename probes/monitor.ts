@@ -1,5 +1,5 @@
 import type { ZCLCommandFrame } from '@thingmate/zigbee';
-import { Cc2652pZigbeeCoordinator } from '../src/cc2652p-zigbee-coordinator/cc2652p-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '../src/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 import { requestCoordinatorPort } from './open-port/open-port.ts';
 
 function formatFrame(frame: ZCLCommandFrame): string {
@@ -17,7 +17,7 @@ function formatFrame(frame: ZCLCommandFrame): string {
 
 try {
   const port = await requestCoordinatorPort();
-  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
 
   const resource = await coordinator.command.observe.call(new AbortController().signal);
   resource.listen((frame): void => {

@@ -1,5 +1,7 @@
 import type { SerialPort } from '@thingmate/node-web-serial';
 import type { ZigbeeCoordinatorConfig } from '@thingmate/zigbee';
+import { ZnpConnection } from '../znp-connection/znp-connection.ts';
+import { ZnpSubsystem, type ZnpFrame } from '../znp-frame/znp-frame.ts';
 import {
   commissionZnpNetwork,
   littleEndianToBigint,
@@ -8,10 +10,8 @@ import {
   uintToLittleEndian,
   ZDO_DEVICE_STATE,
   ZNP_NV_ITEM_ID,
-  type Cc2652pNetworkOptions,
-} from '../cc2652p-network/cc2652p-network.ts';
-import { ZnpConnection } from '../znp-connection/znp-connection.ts';
-import { ZnpSubsystem, type ZnpFrame } from '../znp-frame/znp-frame.ts';
+  type ZnpNetworkOptions,
+} from '../znp-network/znp-network.ts';
 import { ZnpNvMemory } from '../znp-nv/znp-nv.ts';
 
 /** Z-Stack AF profile identifier for Home Automation. */
@@ -21,11 +21,11 @@ const HOME_AUTOMATION_PROFILE_ID = 0x0104 as const;
 const DEFAULT_TX_RADIO = 5 as const;
 
 /**
- * The serial connection to a CC2652P ZNP coordinator, with its lifecycle:
+ * The serial connection to a Z-Stack ZNP coordinator, with its lifecycle:
  * opening the port, skipping a possible bootloader, starting the network,
  * registering the Zigbee endpoint, and caching the coordinator's state.
  */
-export class Cc2652pZnpDevice {
+export class ZnpDevice {
   readonly #port: SerialPort;
   readonly #frameListeners: ((frame: ZnpFrame) => void)[] = [];
   readonly #configListeners: ((config: ZigbeeCoordinatorConfig) => void)[] = [];
@@ -35,7 +35,7 @@ export class Cc2652pZnpDevice {
   #sequence: number = 0;
   #transId: number = 0;
   #txRadio: number = DEFAULT_TX_RADIO;
-  #pendingNetworkOptions: Cc2652pNetworkOptions | undefined;
+  #pendingNetworkOptions: ZnpNetworkOptions | undefined;
   #txRadioPending: boolean = false;
 
   constructor(port: SerialPort) {
@@ -301,7 +301,7 @@ export class Cc2652pZnpDevice {
 /**
  * Converts a coordinator configuration into commissioning network options.
  */
-function toNetworkOptions(config: ZigbeeCoordinatorConfig): Cc2652pNetworkOptions {
+function toNetworkOptions(config: ZigbeeCoordinatorConfig): ZnpNetworkOptions {
   return {
     channel: config.channel,
     panId: config.panId,
@@ -314,7 +314,7 @@ function toNetworkOptions(config: ZigbeeCoordinatorConfig): Cc2652pNetworkOption
  * Generates random network options: channel 11, a random PAN identifier,
  * extended PAN identifier, and network key.
  */
-function generateRandomNetworkOptions(): Cc2652pNetworkOptions {
+function generateRandomNetworkOptions(): ZnpNetworkOptions {
   const key: Uint8Array<ArrayBuffer> = new Uint8Array(16);
   const extPanIdBytes: Uint8Array<ArrayBuffer> = new Uint8Array(8);
   globalThis.crypto.getRandomValues(key);

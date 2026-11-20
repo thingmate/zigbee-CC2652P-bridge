@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { MockZnpDevice } from '../../fabrique/test/mock-znp-device.ts';
-import { ZNP_NV_ITEM_ID } from '../cc2652p-network/cc2652p-network.ts';
 import { ZnpSubsystem } from '../znp-frame/znp-frame.ts';
-import { Cc2652pZnpDevice } from './cc2652p-znp-device.ts';
+import { ZNP_NV_ITEM_ID } from '../znp-network/znp-network.ts';
+import { ZnpDevice } from './znp-device.ts';
 
 const NETWORK = {
   channel: 11,
@@ -14,10 +14,10 @@ const NETWORK = {
   ]),
 };
 
-describe('Cc2652pZnpDevice', () => {
+describe('ZnpDevice', () => {
   it('commissions a network on first start when none is configured', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     expect(mock.getNvItem(ZNP_NV_ITEM_ID.ZNP_HAS_CONFIGURED)).toEqual(Uint8Array.from([0x55]));
     // The Zigbee endpoint has been registered.
@@ -30,7 +30,7 @@ describe('Cc2652pZnpDevice', () => {
   it('skips commissioning when the coordinator already runs a network', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     mock.deviceState = 0x09; // ZB_COORD
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     expect(mock.getNvItem(ZNP_NV_ITEM_ID.ZNP_HAS_CONFIGURED)).toBeUndefined();
     // No commissioning request has been written.
@@ -45,7 +45,7 @@ describe('Cc2652pZnpDevice', () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     mock.deviceState = 0x00; // HOLD
     mock.setNvItem(ZNP_NV_ITEM_ID.ZNP_HAS_CONFIGURED, Uint8Array.from([0x55]));
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     // A ZDO startup-from-app request has been written.
     expect(
@@ -57,14 +57,14 @@ describe('Cc2652pZnpDevice', () => {
 
   it('reads the configuration reported by the coordinator', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     expect(await device.readConfig()).toEqual({ ...NETWORK, txRadio: 5 });
   });
 
   it('stores a configuration written before the first start', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.writeConfig({
       channel: 25,
       panId: 0x4321,
@@ -83,7 +83,7 @@ describe('Cc2652pZnpDevice', () => {
 
   it('only tunes the radio when the written network parameters are unchanged', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     const before: number = mock.port.written.length;
     await device.writeConfig({ ...NETWORK, txRadio: 3 });
@@ -100,7 +100,7 @@ describe('Cc2652pZnpDevice', () => {
 
   it('re-commissions the network when the written parameters differ', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     const configurations: unknown[] = [];
     device.onConfig((config): void => {
@@ -121,7 +121,7 @@ describe('Cc2652pZnpDevice', () => {
 
   it('emits the configuration after a startup', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     const configurations: unknown[] = [];
     device.onConfig((config): void => {
       configurations.push(config);
@@ -132,7 +132,7 @@ describe('Cc2652pZnpDevice', () => {
 
   it('dispatches frames to registered listeners after a startup', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await device.ensureStarted();
     const payloads: Uint8Array[] = [];
     device.onFrame((frame): void => {
@@ -155,7 +155,7 @@ describe('Cc2652pZnpDevice', () => {
   it('retries the startup after a failure', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
     mock.genericStatus = 0x02; // every request fails
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(mock.port);
+    const device: ZnpDevice = new ZnpDevice(mock.port);
     await expect(device.ensureStarted()).rejects.toThrow();
     mock.genericStatus = 0x00;
     await device.ensureStarted();

@@ -1,8 +1,8 @@
 {
-  "name": "@thingmate/zigbee-CC2652P-bridge",
+  "name": "@thingmate/znp-zigbee-bridge",
   "version": "0.0.1",
   "type": "module",
-  "description": "Drive a Zigbee coordinator from a CC2652P Z-Stack ZNP coordinator over the Web Serial API",
+  "description": "Drive a Zigbee coordinator from a Z-Stack 3.x ZNP coordinator (SONOFF ZBDongle-P, CC1352P, CC2531 among others) over the Web Serial API",
   "keywords": [
     "zigbee",
     "cc2652p",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thingmate/zigbee-CC2652P-bridge.git"
+    "url": "git+https://github.com/thingmate/znp-zigbee-bridge.git"
   },
   "packageManager": "yarn@4.18.1",
   "main": "./index.js",

@@ -1,14 +1,14 @@
 import type { SerialPort } from '@thingmate/node-web-serial';
 import { ZigbeeCoordinator } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
-import { Cc2652pZigbeeCoordinatorConfigBridge } from '../abilities/config/cc2652p-zigbee-coordinator-config-bridge.ts';
-import { Cc2652pZigbeeCommandFrameBridge } from '../abilities/frame/cc2652p-zigbee-command-frame-bridge.ts';
-import { uintToLittleEndian } from '../cc2652p-network/cc2652p-network.ts';
-import { Cc2652pZnpDevice } from '../cc2652p-znp-device/cc2652p-znp-device.ts';
+import { ZnpZigbeeCoordinatorConfigBridge } from '../abilities/config/znp-zigbee-coordinator-config-bridge.ts';
+import { ZnpZigbeeCommandFrameBridge } from '../abilities/frame/znp-zigbee-command-frame-bridge.ts';
+import { ZnpDevice } from '../znp-device/znp-device.ts';
 import { type ZnpFrame, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
+import { uintToLittleEndian } from '../znp-network/znp-network.ts';
 
 /**
- * A {@link ZigbeeCoordinator} driven by a CC2652P Z-Stack ZNP coordinator
+ * A {@link ZigbeeCoordinator} driven by a Z-Stack 3.x ZNP coordinator
  * (SONOFF ZBDongle-P among others) over a Web Serial API port.
  *
  * Each Zigbee ability is bridged to the ZNP protocol:
@@ -22,17 +22,17 @@ import { type ZnpFrame, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
  * bootloader, starts (or resumes) the Zigbee network, and registers the
  * Zigbee endpoint used for sending and observing frames.
  */
-export class Cc2652pZigbeeCoordinator extends ZigbeeCoordinator {
-  readonly #device: Cc2652pZnpDevice;
+export class ZnpZigbeeCoordinator extends ZigbeeCoordinator {
+  readonly #device: ZnpDevice;
 
   /**
    * Creates a Zigbee coordinator bridged to the provided serial port.
    * @param port - The Web Serial API port connected to the coordinator.
    */
   constructor(port: SerialPort) {
-    const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(port);
+    const device: ZnpDevice = new ZnpDevice(port);
     super({
-      config: new Cc2652pZigbeeCoordinatorConfigBridge(device),
+      config: new ZnpZigbeeCoordinatorConfigBridge(device),
       permitJoin: new AsyncFunction<readonly [duration: number], void>(
         async (_signal: AbortSignal, duration: number): Promise<void> => {
           await device.ensureStarted();
@@ -51,7 +51,7 @@ export class Cc2652pZigbeeCoordinator extends ZigbeeCoordinator {
           }
         },
       ),
-      command: new Cc2652pZigbeeCommandFrameBridge(device),
+      command: new ZnpZigbeeCommandFrameBridge(device),
     });
     this.#device = device;
   }

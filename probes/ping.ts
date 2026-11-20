@@ -1,4 +1,4 @@
-import { Cc2652pZigbeeCoordinator } from '../src/cc2652p-zigbee-coordinator/cc2652p-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '../src/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 import { requestCoordinatorPort } from './open-port/open-port.ts';
 
 const STATE_MEANING: Readonly<Record<number, string>> = {
@@ -8,7 +8,7 @@ const STATE_MEANING: Readonly<Record<number, string>> = {
 
 try {
   const port = await requestCoordinatorPort();
-  const coordinator: Cc2652pZigbeeCoordinator = new Cc2652pZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
   const state: number = await coordinator.readDeviceState();
   console.log(`device state: ${state} (${STATE_MEANING[state] ?? 'unknown'})`);
   await coordinator.close();
