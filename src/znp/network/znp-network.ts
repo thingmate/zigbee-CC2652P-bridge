@@ -1,6 +1,6 @@
-import type { ZnpConnection } from '../znp-connection/znp-connection.ts';
-import { ZnpFrameType, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
-import { ZnpNvMemory } from '../znp-nv/znp-nv.ts';
+import type { ZnpConnection } from '../connection/znp-connection.ts';
+import { ZnpFrameType, ZnpSubsystem } from '../frame/znp-frame.ts';
+import { ZnpNvMemory } from '../nv/znp-nv.ts';
 
 /**
  * Network options used to commission a Z-Stack ZNP coordinator.

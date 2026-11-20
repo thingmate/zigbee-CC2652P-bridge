@@ -4,7 +4,7 @@ import {
   ZnpFrameType,
   ZnpSubsystem,
   type ZnpFrame,
-} from '../../src/znp-frame/znp-frame.ts';
+} from '../../src/znp/frame/znp-frame.ts';
 import { MockSerialPort } from './tools.ts';
 
 /**

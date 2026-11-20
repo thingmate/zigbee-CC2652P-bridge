@@ -1,5 +1,5 @@
-import type { ZnpConnection } from '../znp-connection/znp-connection.ts';
-import { ZnpSubsystem } from '../znp-frame/znp-frame.ts';
+import type { ZnpConnection } from '../connection/znp-connection.ts';
+import { ZnpSubsystem } from '../frame/znp-frame.ts';
 
 /**
  * SYS subsystem command identifiers used by the NV memory helpers.

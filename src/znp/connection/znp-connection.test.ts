@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockSerialPort, TestTools } from '../../fabrique/test/tools.ts';
+import { MockSerialPort, TestTools } from '../../../fabrique/test/tools.ts';
 import {
   encodeZnpFrame,
   ZnpFrameType,
   ZnpSubsystem,
   type ZnpFrame,
   type ZnpSubsystem as ZnpSubsystemType,
-} from '../znp-frame/znp-frame.ts';
+} from '../frame/znp-frame.ts';
 import { ZnpConnection } from './znp-connection.ts';
 
 const mockDeviceResponse = (bytes: Uint8Array): Uint8Array[] | undefined => {

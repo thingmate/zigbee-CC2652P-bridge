@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { SerialPort as WebSerialPort } from '@thingmate/node-web-serial';
-import { MockSerialPort } from '../../fabrique/test/tools.ts';
+import { MockSerialPort } from '../../../fabrique/test/tools.ts';
 
 describe('SerialPort contract', () => {
   it('is satisfied by the test mock', () => {

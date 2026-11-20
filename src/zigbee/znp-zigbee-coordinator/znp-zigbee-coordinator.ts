@@ -1,11 +1,11 @@
 import type { SerialPort } from '@thingmate/node-web-serial';
 import { ZigbeeCoordinator } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
+import { ZnpDevice } from '../../znp/device/znp-device.ts';
+import { type ZnpFrame, ZnpSubsystem } from '../../znp/frame/znp-frame.ts';
+import { uintToLittleEndian } from '../../znp/network/znp-network.ts';
 import { ZnpZigbeeCoordinatorConfigBridge } from '../abilities/config/znp-zigbee-coordinator-config-bridge.ts';
 import { ZnpZigbeeCommandFrameBridge } from '../abilities/frame/znp-zigbee-command-frame-bridge.ts';
-import { ZnpDevice } from '../znp-device/znp-device.ts';
-import { type ZnpFrame, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
-import { uintToLittleEndian } from '../znp-network/znp-network.ts';
 
 /**
  * A {@link ZigbeeCoordinator} driven by a Z-Stack 3.x ZNP coordinator

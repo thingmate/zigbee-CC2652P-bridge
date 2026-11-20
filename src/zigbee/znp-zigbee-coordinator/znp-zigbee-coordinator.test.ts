@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockZnpDevice } from '../../fabrique/test/mock-znp-device.ts';
+import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
 import { ZnpZigbeeCoordinator } from './znp-zigbee-coordinator.ts';
 
 describe('ZnpZigbeeCoordinator', () => {

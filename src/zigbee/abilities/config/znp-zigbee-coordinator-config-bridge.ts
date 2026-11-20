@@ -1,8 +1,8 @@
 import { PropertyAbilities } from '@thingmate/abilities';
 import type { ZigbeeCoordinatorConfig, ZigbeeCoordinatorConfigAbilities } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
+import type { ZnpDevice } from '../../../znp/device/znp-device.ts';
 import { observableFromListenerSource } from '../../observable-from-listener-source/observable-from-listener-source.ts';
-import type { ZnpDevice } from '../../znp-device/znp-device.ts';
 
 /**
  * Property abilities over the network configuration of a Z-Stack ZNP

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockZnpDevice } from '../../fabrique/test/mock-znp-device.ts';
-import { ZnpConnection } from '../znp-connection/znp-connection.ts';
+import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
+import { ZnpConnection } from '../connection/znp-connection.ts';
 import { ZnpNvMemory } from './znp-nv.ts';
 
 describe('ZnpNvMemory', () => {

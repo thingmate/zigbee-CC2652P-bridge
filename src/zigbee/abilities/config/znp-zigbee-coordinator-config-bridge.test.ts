@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
+import { MockZnpDevice } from '../../../../fabrique/test/mock-znp-device.ts';
 import { ZnpZigbeeCoordinatorConfigBridge } from './znp-zigbee-coordinator-config-bridge.ts';
 
 describe('ZnpZigbeeCoordinatorConfigBridge', () => {
@@ -9,7 +9,7 @@ describe('ZnpZigbeeCoordinatorConfigBridge', () => {
     const abilities: ZnpZigbeeCoordinatorConfigBridge = new ZnpZigbeeCoordinatorConfigBridge(
       // The bridge only needs the device's abilities; a real device is
       // constructed with the mock's port.
-      new (await import('../../znp-device/znp-device.ts')).ZnpDevice(mock.port),
+      new (await import('../../../znp/device/znp-device.ts')).ZnpDevice(mock.port),
     );
     const config: Awaited<ReturnType<typeof abilities.read.call>> = await abilities.read.call(
       new AbortController().signal,
@@ -28,7 +28,7 @@ describe('ZnpZigbeeCoordinatorConfigBridge', () => {
 
   it('emits the configuration through the observation', async () => {
     const mock: MockZnpDevice = new MockZnpDevice();
-    const { ZnpDevice } = await import('../../znp-device/znp-device.ts');
+    const { ZnpDevice } = await import('../../../znp/device/znp-device.ts');
     const abilities: ZnpZigbeeCoordinatorConfigBridge = new ZnpZigbeeCoordinatorConfigBridge(
       new ZnpDevice(mock.port),
     );

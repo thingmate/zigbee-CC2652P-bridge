@@ -1,7 +1,7 @@
 import type { SerialPort } from '@thingmate/node-web-serial';
 import type { ZigbeeCoordinatorConfig } from '@thingmate/zigbee';
-import { ZnpConnection } from '../znp-connection/znp-connection.ts';
-import { ZnpSubsystem, type ZnpFrame } from '../znp-frame/znp-frame.ts';
+import { ZnpConnection } from '../connection/znp-connection.ts';
+import { ZnpSubsystem, type ZnpFrame } from '../frame/znp-frame.ts';
 import {
   commissionZnpNetwork,
   littleEndianToBigint,
@@ -11,8 +11,8 @@ import {
   ZDO_DEVICE_STATE,
   ZNP_NV_ITEM_ID,
   type ZnpNetworkOptions,
-} from '../znp-network/znp-network.ts';
-import { ZnpNvMemory } from '../znp-nv/znp-nv.ts';
+} from '../network/znp-network.ts';
+import { ZnpNvMemory } from '../nv/znp-nv.ts';
 
 /** Z-Stack AF profile identifier for Home Automation. */
 const HOME_AUTOMATION_PROFILE_ID = 0x0104 as const;

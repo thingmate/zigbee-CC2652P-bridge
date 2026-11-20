@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockZnpDevice } from '../../fabrique/test/mock-znp-device.ts';
-import { ZnpSubsystem } from '../znp-frame/znp-frame.ts';
-import { ZNP_NV_ITEM_ID } from '../znp-network/znp-network.ts';
+import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
+import { ZnpSubsystem } from '../frame/znp-frame.ts';
+import { ZNP_NV_ITEM_ID } from '../network/znp-network.ts';
 import { ZnpDevice } from './znp-device.ts';
 
 const NETWORK = {

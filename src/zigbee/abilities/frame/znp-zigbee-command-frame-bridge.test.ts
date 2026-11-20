@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { MockZnpDevice } from '../../../fabrique/test/mock-znp-device.ts';
-import { ZnpDevice } from '../../znp-device/znp-device.ts';
-import { ZnpSubsystem } from '../../znp-frame/znp-frame.ts';
+import { MockZnpDevice } from '../../../../fabrique/test/mock-znp-device.ts';
+import { ZnpDevice } from '../../../znp/device/znp-device.ts';
+import { ZnpSubsystem } from '../../../znp/frame/znp-frame.ts';
 import { ZnpZigbeeCommandFrameBridge } from './znp-zigbee-command-frame-bridge.ts';
 
 describe('ZnpZigbeeCommandFrameBridge', () => {

@@ -1,5 +1,5 @@
 import type { ZCLCommandFrame } from '@thingmate/zigbee';
-import { ZnpZigbeeCoordinator } from '../src/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
+import { ZnpZigbeeCoordinator } from '../src/zigbee/znp-zigbee-coordinator/znp-zigbee-coordinator.ts';
 import { requestCoordinatorPort } from './open-port/open-port.ts';
 
 /** Duration of the frame observation window, in milliseconds. */

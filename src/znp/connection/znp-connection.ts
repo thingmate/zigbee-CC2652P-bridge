@@ -5,7 +5,7 @@ import {
   ZnpFrameType,
   type ZnpFrame,
   type ZnpSubsystem,
-} from '../znp-frame/znp-frame.ts';
+} from '../frame/znp-frame.ts';
 
 /**
  * A live connection to a Z-Stack ZNP coordinator over a Web Serial API port:
