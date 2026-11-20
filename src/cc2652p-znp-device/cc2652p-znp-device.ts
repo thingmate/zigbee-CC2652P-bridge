@@ -1,3 +1,4 @@
+import type { SerialPort } from '@thingmate/node-web-serial';
 import type { ZigbeeCoordinatorConfig } from '@thingmate/zigbee';
 import {
   commissionZnpNetwork,
@@ -9,7 +10,6 @@ import {
   ZNP_NV_ITEM_ID,
   type Cc2652pNetworkOptions,
 } from '../cc2652p-network/cc2652p-network.ts';
-import type { SerialPortLike } from '../serial-port-like/serial-port-like.ts';
 import { ZnpConnection } from '../znp-connection/znp-connection.ts';
 import { ZnpSubsystem, type ZnpFrame } from '../znp-frame/znp-frame.ts';
 import { ZnpNvMemory } from '../znp-nv/znp-nv.ts';
@@ -26,7 +26,7 @@ const DEFAULT_TX_RADIO = 5 as const;
  * registering the Zigbee endpoint, and caching the coordinator's state.
  */
 export class Cc2652pZnpDevice {
-  readonly #port: SerialPortLike;
+  readonly #port: SerialPort;
   readonly #frameListeners: ((frame: ZnpFrame) => void)[] = [];
   readonly #configListeners: ((config: ZigbeeCoordinatorConfig) => void)[] = [];
   #connection: ZnpConnection | undefined;
@@ -38,7 +38,7 @@ export class Cc2652pZnpDevice {
   #pendingNetworkOptions: Cc2652pNetworkOptions | undefined;
   #txRadioPending: boolean = false;
 
-  constructor(port: SerialPortLike) {
+  constructor(port: SerialPort) {
     this.#port = port;
   }
 

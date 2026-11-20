@@ -19,7 +19,7 @@ npm install @thingmate/zigbee-CC2652P-bridge --save
 
 See also [`probes/README.md`](./probes/README.md): runnable hardware probes exercising the public API against a real dongle.
 
-This library bridges a `ZigbeeCoordinator` to a CC2652P coordinator speaking the Z-Stack ZNP (Monitor-and-Test) protocol over a serial port. The port is provided as a `SerialPortLike`: the Web Serial API `SerialPort` structurally satisfies it, so the same code runs in a browser (port from `navigator.serial`), in Node.js (through the `NodeSerial` hub of [`@thingmate/node-web-serial`](https://www.npmjs.com/package/@thingmate/node-web-serial)), or in tests (any mock).
+This library bridges a `ZigbeeCoordinator` to a CC2652P coordinator speaking the Z-Stack ZNP (Monitor-and-Test) protocol over a serial port. The port is provided as a Web Serial API `SerialPort`: any spec-faithful port works, so the same code runs in a browser (port from `navigator.serial`), in Node.js (through the `NodeSerial` hub of [`@thingmate/node-web-serial`](https://www.npmjs.com/package/@thingmate/node-web-serial)), or in tests (any mock).
 
 Each coordinator ability is mapped to ZNP commands:
 

@@ -1,10 +1,10 @@
 import type {
-  SerialPortLike,
-  SerialPortLikeInfo,
-  SerialPortLikeOptions,
-  SerialPortLikeSignals,
-  SerialPortLikeSignalsState,
-} from '../../src/serial-port-like/serial-port-like.ts';
+  SerialInputSignals,
+  SerialOptions,
+  SerialOutputSignals,
+  SerialPort,
+  SerialPortInfo,
+} from '@thingmate/node-web-serial';
 
 export class TestTools {
   static sleep(duration: number, signal?: AbortSignal): Promise<void> {
@@ -53,16 +53,17 @@ export class TestTools {
 }
 
 /**
- * Scriptable in-memory `SerialPortLike` mock for tests: the test controls the
- * bytes the device sends back, and the bytes written by the host are recorded.
+ * Scriptable in-memory Web Serial API `SerialPort` mock for tests: the test
+ * controls the bytes the device sends back, and the bytes written by the host
+ * are recorded.
  */
-export class MockSerialPort implements SerialPortLike {
+export class MockSerialPort extends EventTarget implements SerialPort {
   #readableController: ReadableStreamDefaultController<Uint8Array> | undefined;
   #readable: ReadableStream<Uint8Array> | null = null;
   #writable: WritableStream<Uint8Array> | null = null;
   #opened: boolean = false;
-  #options: SerialPortLikeOptions | undefined;
-  #signals: SerialPortLikeSignalsState = {
+  #options: SerialOptions | undefined;
+  readonly #signals: SerialInputSignals = {
     clearToSend: false,
     dataCarrierDetect: false,
     dataSetReady: false,
@@ -78,6 +79,14 @@ export class MockSerialPort implements SerialPortLike {
    */
   respond: (bytes: Uint8Array) => Uint8Array[] | undefined = (): undefined => undefined;
 
+  readonly onconnect = null;
+
+  readonly ondisconnect = null;
+
+  get connected(): boolean {
+    return this.#opened;
+  }
+
   get readable(): ReadableStream<Uint8Array> | null {
     return this.#readable;
   }
@@ -90,11 +99,11 @@ export class MockSerialPort implements SerialPortLike {
     return this.#opened;
   }
 
-  get options(): SerialPortLikeOptions | undefined {
+  get options(): SerialOptions | undefined {
     return this.#options;
   }
 
-  async open(options: SerialPortLikeOptions): Promise<void> {
+  async open(options: SerialOptions): Promise<void> {
     if (this.#opened) {
       throw new Error('port is already open');
     }
@@ -121,15 +130,21 @@ export class MockSerialPort implements SerialPortLike {
    * Accepts signal changes and ignores them: the Web Serial API `getSignals`
    * reports input signals only, which the mock keeps fixed.
    */
-  async setSignals(_signals?: SerialPortLikeSignals): Promise<void> {}
+  async setSignals(_signals?: SerialOutputSignals): Promise<void> {}
 
-  async getSignals(): Promise<SerialPortLikeSignalsState> {
+  async getSignals(): Promise<SerialInputSignals> {
     return this.#signals;
   }
 
-  getInfo(): SerialPortLikeInfo {
+  getInfo(): SerialPortInfo {
     return { usbVendorId: 0x10c4, usbProductId: 0xea60 };
   }
+
+  /**
+   * Nothing to revoke: a mock grants no permission. The specification allows
+   * an implementation that cannot revoke to resolve without acting.
+   */
+  async forget(): Promise<void> {}
 
   /**
    * Closes the port, mirroring the spec-faithful close of a real port: the

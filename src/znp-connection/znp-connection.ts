@@ -1,4 +1,4 @@
-import type { SerialPortLike } from '../serial-port-like/serial-port-like.ts';
+import type { SerialPort } from '@thingmate/node-web-serial';
 import {
   encodeZnpFrame,
   ZnpFrameDecoder,
@@ -13,7 +13,7 @@ import {
  * dispatches every received frame to waiters and listeners.
  */
 export class ZnpConnection {
-  readonly #port: SerialPortLike;
+  readonly #port: SerialPort;
   readonly #writer: WritableStreamDefaultWriter<Uint8Array>;
   readonly #waiters: ZnpFrameWaiter[] = [];
   readonly #listeners: ((frame: ZnpFrame) => void)[] = [];
@@ -31,7 +31,7 @@ export class ZnpConnection {
    * @returns The opened connection.
    */
   static async open(
-    port: SerialPortLike,
+    port: SerialPort,
     { baudRate = 115200 }: ZnpConnectionOptions = {},
   ): Promise<ZnpConnection> {
     await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none', flowControl: 'none' });
@@ -40,7 +40,7 @@ export class ZnpConnection {
     return connection;
   }
 
-  constructor(port: SerialPortLike) {
+  constructor(port: SerialPort) {
     this.#port = port;
     const writable: WritableStream<Uint8Array> | null = port.writable;
     if (writable === null) {

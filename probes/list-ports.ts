@@ -1,7 +1,9 @@
-import { NodeSerial } from '@thingmate/node-web-serial';
+import { NodeSerial, type NodeSerialPort } from '@thingmate/node-web-serial';
 
 const serial: NodeSerial = new NodeSerial();
-const ports: Awaited<ReturnType<typeof serial.getPorts>> = await serial.getPorts();
+// The hub hands out its own NodeSerialPort instances; the class carries the
+// Node `path` extension the Web Serial `SerialPort` interface omits.
+const ports: NodeSerialPort[] = (await serial.getPorts()) as NodeSerialPort[];
 if (ports.length === 0) {
   console.log('no serial port found');
   process.exit(1);

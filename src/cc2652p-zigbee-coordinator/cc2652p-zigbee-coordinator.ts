@@ -1,10 +1,10 @@
+import type { SerialPort } from '@thingmate/node-web-serial';
 import { ZigbeeCoordinator } from '@thingmate/zigbee';
 import { AsyncFunction } from '@xstd/async-function';
 import { Cc2652pZigbeeCoordinatorConfigBridge } from '../abilities/config/cc2652p-zigbee-coordinator-config-bridge.ts';
 import { Cc2652pZigbeeCommandFrameBridge } from '../abilities/frame/cc2652p-zigbee-command-frame-bridge.ts';
 import { uintToLittleEndian } from '../cc2652p-network/cc2652p-network.ts';
 import { Cc2652pZnpDevice } from '../cc2652p-znp-device/cc2652p-znp-device.ts';
-import type { SerialPortLike } from '../serial-port-like/serial-port-like.ts';
 import { type ZnpFrame, ZnpSubsystem } from '../znp-frame/znp-frame.ts';
 
 /**
@@ -29,7 +29,7 @@ export class Cc2652pZigbeeCoordinator extends ZigbeeCoordinator {
    * Creates a Zigbee coordinator bridged to the provided serial port.
    * @param port - The Web Serial API port connected to the coordinator.
    */
-  constructor(port: SerialPortLike) {
+  constructor(port: SerialPort) {
     const device: Cc2652pZnpDevice = new Cc2652pZnpDevice(port);
     super({
       config: new Cc2652pZigbeeCoordinatorConfigBridge(device),
