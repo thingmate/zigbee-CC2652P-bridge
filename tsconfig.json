@@ -4,7 +4,7 @@
     "target": "ESNext",
     "module": "NodeNext",
     "lib": ["ESNext", "DOM"],
-    "types": ["node"],
+    "types": ["node", "w3c-web-serial"],
     "typeRoots": ["node_modules/@types"],
     "useDefineForClassFields": true,
     "skipLibCheck": true,
@@ -54,5 +54,5 @@
     "strictPropertyInitialization": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "probes/**/*.ts"]
 }
