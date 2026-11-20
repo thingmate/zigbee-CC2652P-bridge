@@ -26,11 +26,10 @@ export class ZnpZigbeeCoordinator extends ZigbeeCoordinator {
   readonly #device: ZnpDevice;
 
   /**
-   * Creates a Zigbee coordinator bridged to the provided serial port.
-   * @param port - The Web Serial API port connected to the coordinator.
+   * Creates a Zigbee coordinator driven by the provided ZNP device.
+   * @param device - The ZNP device connected to the coordinator.
    */
-  constructor(port: SerialPort) {
-    const device: ZnpDevice = new ZnpDevice(port);
+  constructor(device: ZnpDevice) {
     super({
       config: new ZnpZigbeeCoordinatorConfigBridge(device),
       permitJoin: new AsyncFunction<readonly [duration: number], void>(
@@ -54,6 +53,14 @@ export class ZnpZigbeeCoordinator extends ZigbeeCoordinator {
       command: new ZnpZigbeeCommandFrameBridge(device),
     });
     this.#device = device;
+  }
+
+  /**
+   * Creates a coordinator bridged to the provided serial port.
+   * @param port - The Web Serial API port connected to the coordinator.
+   */
+  static fromPort(port: SerialPort): ZnpZigbeeCoordinator {
+    return new ZnpZigbeeCoordinator(new ZnpDevice(port));
   }
 
   /**

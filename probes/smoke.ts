@@ -20,7 +20,7 @@ function formatFrame(frame: ZCLCommandFrame): string {
 
 try {
   const port = await requestCoordinatorPort();
-  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = ZnpZigbeeCoordinator.fromPort(port);
 
   const state: number = await coordinator.readDeviceState();
   console.log(`device state: ${state}`);

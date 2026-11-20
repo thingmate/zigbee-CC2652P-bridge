@@ -44,7 +44,7 @@ const serial: NodeSerial = new NodeSerial();
 const port = await serial.requestPort({ filters: [{ usbVendorId: 0x10c4 }] }); // Silicon Labs CP2102N
 
 // the standard ZigbeeCoordinator abilities, backed by the dongle
-const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
+const coordinator: ZnpZigbeeCoordinator = ZnpZigbeeCoordinator.fromPort(port);
 
 // read the current network configuration
 const config = await coordinator.config.read.call(new AbortController().signal);

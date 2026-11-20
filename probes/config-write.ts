@@ -92,7 +92,7 @@ function formatConfig(config: ZigbeeCoordinatorConfig): string {
 try {
   const overrides: ConfigOverrides = parseArguments(process.argv.slice(2));
   const port = await requestCoordinatorPort();
-  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = ZnpZigbeeCoordinator.fromPort(port);
 
   const current: ZigbeeCoordinatorConfig = await coordinator.config.read.call(
     new AbortController().signal,

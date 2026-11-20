@@ -17,7 +17,7 @@ function formatFrame(frame: ZCLCommandFrame): string {
 
 try {
   const port = await requestCoordinatorPort();
-  const coordinator: ZnpZigbeeCoordinator = new ZnpZigbeeCoordinator(port);
+  const coordinator: ZnpZigbeeCoordinator = ZnpZigbeeCoordinator.fromPort(port);
 
   const resource = await coordinator.command.observe.call(new AbortController().signal);
   resource.listen((frame): void => {
