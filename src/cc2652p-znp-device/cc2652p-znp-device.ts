@@ -48,14 +48,15 @@ export class Cc2652pZnpDevice {
    * clears the shared startup so the next caller retries.
    */
   ensureStarted(): Promise<void> {
-    this.#startedPromise ??= this.#start().catch((error: unknown): never => {
-      // Close whatever was opened, so the next caller can retry cleanly.
+    this.#startedPromise ??= this.#start().catch(async (error: unknown): Promise<never> => {
+      // Close whatever was opened and wait for it, so the next caller retries
+      // cleanly: a concurrent re-open would race the close and hit an open port.
       const connection: ZnpConnection | undefined = this.#connection;
       this.#connection = undefined;
       this.#nv = undefined;
       this.#startedPromise = undefined;
       if (connection !== undefined) {
-        void connection.close().catch((): void => undefined);
+        await connection.close().catch((): void => undefined);
       }
       throw error;
     });

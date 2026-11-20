@@ -20,6 +20,8 @@ export class ZnpConnection {
   readonly #decoder: ZnpFrameDecoder = new ZnpFrameDecoder();
   #queueTail: Promise<void> = Promise.resolve();
   #closed: boolean = false;
+  #reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+  #reading: Promise<void> | undefined;
 
   /**
    * Opens a ZNP connection over the provided port.
@@ -34,7 +36,7 @@ export class ZnpConnection {
   ): Promise<ZnpConnection> {
     await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none', flowControl: 'none' });
     const connection: ZnpConnection = new ZnpConnection(port);
-    connection.#startReading();
+    connection.#reading = connection.#startReading();
     return connection;
   }
 
@@ -142,7 +144,10 @@ export class ZnpConnection {
   }
 
   /**
-   * Closes the connection and the underlying port.
+   * Closes the connection and the underlying port. The writer lock is
+   * released after draining, and the read loop is cancelled and awaited, so
+   * the port's streams are unlocked when the port closes — a locked port
+   * refuses to close and would stay open for its whole life.
    */
   async close(): Promise<void> {
     if (this.#closed) {
@@ -154,7 +159,10 @@ export class ZnpConnection {
       waiter.reject(new Error('connection is closed'));
     }
     await this.#writer.close().catch((): void => undefined);
-    await this.#port.close().catch((): void => undefined);
+    this.#writer.releaseLock();
+    this.#reader?.cancel().catch((): void => undefined);
+    await this.#reading?.catch((): void => undefined);
+    await this.#port.close();
   }
 
   async #exchange(
@@ -180,6 +188,7 @@ export class ZnpConnection {
       throw new Error('port is not open: no readable stream');
     }
     const reader: ReadableStreamDefaultReader<Uint8Array> = readable.getReader();
+    this.#reader = reader;
     try {
       while (!this.#closed) {
         const result: ReadableStreamReadResult<Uint8Array> = await reader.read();

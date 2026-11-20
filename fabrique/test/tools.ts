@@ -131,9 +131,18 @@ export class MockSerialPort implements SerialPortLike {
     return { usbVendorId: 0x10c4, usbProductId: 0xea60 };
   }
 
+  /**
+   * Closes the port, mirroring the spec-faithful close of a real port: the
+   * readable stream is cancelled and the writable stream aborted — which
+   * rejects with the streams' `TypeError` while a reader or writer holds a
+   * lock, leaving the port open — and once both succeed the port reports
+   * itself closed.
+   */
   async close(): Promise<void> {
+    const readable: ReadableStream<Uint8Array> | null = this.#readable;
+    const writable: WritableStream<Uint8Array> | null = this.#writable;
+    await Promise.all([readable?.cancel(), writable?.abort()]);
     this.#opened = false;
-    this.#readableController?.close();
     this.#readable = null;
     this.#writable = null;
   }

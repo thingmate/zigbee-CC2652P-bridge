@@ -107,6 +107,28 @@ describe('ZnpConnection', () => {
     expect(frame.commandId).toBe(0xc0);
   });
 
+  it('refuses to close a port whose streams are locked, keeping it open', async () => {
+    const port: MockSerialPort = new MockSerialPort();
+    await port.open({ baudRate: 115200 });
+    const reader: ReadableStreamDefaultReader<Uint8Array> | undefined = port.readable?.getReader();
+    const writer: WritableStreamDefaultWriter<Uint8Array> | undefined = port.writable?.getWriter();
+    await expect(port.close()).rejects.toThrow();
+    expect(port.opened).toBe(true);
+    reader?.releaseLock();
+    writer?.releaseLock();
+    await port.close();
+    expect(port.opened).toBe(false);
+  });
+
+  it('releases the port on close so it can be reopened', async () => {
+    const port: MockSerialPort = new MockSerialPort();
+    const connection: ZnpConnection = await ZnpConnection.open(port);
+    await connection.close();
+    expect(port.opened).toBe(false);
+    await ZnpConnection.open(port);
+    expect(port.opened).toBe(true);
+  });
+
   it('rejects pending waits on close', async () => {
     const port: MockSerialPort = new MockSerialPort();
     const connection: ZnpConnection = await ZnpConnection.open(port);
